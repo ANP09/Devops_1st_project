@@ -1,0 +1,28 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ap-south-1 \
+          | docker login --username AWS --password-stdin 724560470446.dkr.ecr.ap-south-1.amazonaws.com
+
+      - name: Build Docker Image
+        run: docker build -t devops-app .
+
+      - name: Tag Image
+        run: docker tag devops-app:latest 724560470446.dkr.ecr.ap-south-1.amazonaws.com/1st:latest
+
+      - name: Push to ECR
+        run: docker push 724560470446.dkr.ecr.ap-south-1.amazonaws.com/1st:latest
