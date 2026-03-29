@@ -1,5 +1,4 @@
 name: Deploy to AWS
-
 on:
   push:
     branches:
@@ -9,16 +8,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    permissions:
-        id-token: write
-        contents: read
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v6.0.0
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
@@ -29,11 +24,8 @@ jobs:
           aws ecr get-login-password --region ap-south-1 \
           | docker login --username AWS --password-stdin 724560470446.dkr.ecr.ap-south-1.amazonaws.com
 
-      - name: Build Docker Image
-        run: docker build -t devops-app .
-
-      - name: Tag Image
-        run: docker tag devops-app:latest 724560470446.dkr.ecr.ap-south-1.amazonaws.com/1st:latest
-
-      - name: Push to ECR
-        run: docker push 724560470446.dkr.ecr.ap-south-1.amazonaws.com/1st:latest
+      - name: Build, Tag & Push Docker Image
+        run: |
+          docker build -t devops-app .
+          docker tag devops-app:latest 724560470446.dkr.ecr.ap-south-1.amazonaws.com/1st:latest
+          docker push 724560470446.dkr.ecr.ap-south-1.amazonaws.com/1st:latest
